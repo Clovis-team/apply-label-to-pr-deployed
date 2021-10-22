@@ -1,0 +1,16 @@
+name: 'Apply label to all PR deployed'
+description: 'Apply label to all PR deployed'
+author: 'David Alvarez'
+branding:
+  icon: 'package'
+  color: 'green'
+inputs:
+  github_token:
+    description: 'The GitHub token (if not provided the environment variable GITHUB_TOKEN will be used instead)'
+    required: false
+  label_id:
+    description: 'The label ID to apply'
+    required: true
+runs:
+  using: 'node12'
+  main: 'dist/index.js'

@@ -1,0 +1,44 @@
+{
+  "name": "apply-label-to-pr-deployed",
+  "version": "1.0.0",
+  "description": "Apply label to all PR deployed",
+  "main": "lib/main.js",
+  "scripts": {
+    "build": "tsc",
+    "format": "prettier --write '**/*.ts'",
+    "format-check": "prettier --check '**/*.ts'",
+    "lint": "eslint src/**/*.ts",
+    "package": "ncc build --source-map --license licenses.txt",
+    "all": "npm run build && npm run format && npm run lint && npm run package"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Clovis-team/apply-label-to-pr-deployed.git"
+  },
+  "keywords": [
+    "GitHub",
+    "Actions",
+    "Deployment"
+  ],
+  "author": "GitHub",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Clovis-team/apply-label-to-pr-deployed/issues"
+  },
+  "homepage": "https://github.com/Clovis-team/apply-label-to-pr-deployed#readme",
+  "dependencies": {
+    "@actions/core": "^1.6.0",
+    "@actions/github": "^5.0.0",
+    "@octokit/graphql": "^4.8.0"
+  },
+  "devDependencies": {
+    "@types/node": "^16.10.5",
+    "@typescript-eslint/parser": "^5.0.0",
+    "@vercel/ncc": "^0.31.1",
+    "eslint": "^7.32.0",
+    "eslint-plugin-github": "^4.3.2",
+    "js-yaml": "^4.1.0",
+    "prettier": "2.4.1",
+    "typescript": "^4.4.4"
+  }
+}
