@@ -8,6 +8,12 @@ inputs:
   github_token:
     description: 'The GitHub token (if not provided the environment variable GITHUB_TOKEN will be used instead)'
     required: false
+  repo_name:
+    description: 'Name of the repository'
+    required: true
+  repo_owner:
+    description: 'Owner of the repository'
+    required: true
   label_id:
     description: 'The label ID to apply'
     required: true

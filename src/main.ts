@@ -51,10 +51,9 @@ async function run(): Promise<void> {
     const token = (core.getInput('github_token') ||
       process.env.GITHUB_TOKEN) as string
     const labelId = core.getInput('label_id')
+    const repoName = core.getInput('repo_name')
+    const repoOwner = core.getInput('repo_owner')
     const octokit = github.getOctokit(token)
-    const context = github.context
-    const repoName = context.payload.repository?.name
-    const repoOwner = context.payload.repository?.owner.login
 
     const allOpenedPrs: GraphQlQueryResponseData = await octokit.graphql(
       getAllOpenedPrIds,
