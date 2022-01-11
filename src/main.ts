@@ -91,7 +91,7 @@ async function run(): Promise<void> {
     for (const pr of prsReadyForReviews) {
       // Check that the PR has an active deployment (matching deployment url)
       const hasAnActiveDeployment = activeDeployments.filter(
-        (environment: string) => environment.includes(`pr-${pr.number}-`)
+        (environment: string) => environment.includes(`pr-${pr.number}`)
       ).length
         ? true
         : false

@@ -90,7 +90,7 @@ function run() {
             const activeDeployments = lastDeployments === null || lastDeployments === void 0 ? void 0 : lastDeployments.repository.deployments.nodes.filter((d) => d.environment !== 'main' && d.latestStatus.state === 'SUCCESS').map((d) => d.environment);
             for (const pr of prsReadyForReviews) {
                 // Check that the PR has an active deployment (matching deployment url)
-                const hasAnActiveDeployment = activeDeployments.filter((environment) => environment.includes(`pr-${pr.number}-`)).length
+                const hasAnActiveDeployment = activeDeployments.filter((environment) => environment.includes(`pr-${pr.number}`)).length
                     ? true
                     : false;
                 if (hasAnActiveDeployment) {
