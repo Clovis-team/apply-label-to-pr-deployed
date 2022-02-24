@@ -43,7 +43,6 @@ const getAllOpenedPrIds = `query($repo: String!, $owner: String!) {
       nodes {
         id
         number
-        isDraft
       }
     }
   }
@@ -74,25 +73,19 @@ function run() {
             const repoName = core.getInput('repo_name');
             const repoOwner = core.getInput('repo_owner');
             const octokit = github.getOctokit(token);
-            const allOpenedPrs = yield octokit.graphql(getAllOpenedPrIds, {
+            const pullRequests = yield octokit.graphql(getAllOpenedPrIds, {
                 owner: repoOwner,
                 repo: repoName
             });
-            // Exclude draft PRs
-            const prsReadyForReviews = allOpenedPrs === null || allOpenedPrs === void 0 ? void 0 : allOpenedPrs.repository.pullRequests.nodes.filter((pr) => !pr.isDraft);
             const lastDeployments = yield octokit.graphql(getLastDeployments, {
                 owner: repoOwner,
                 repo: repoName
             });
-            // Exclude :
-            // - main environment
-            // - IN_PROGRESS or INACTIVE deployment
-            const activeDeployments = lastDeployments === null || lastDeployments === void 0 ? void 0 : lastDeployments.repository.deployments.nodes.filter((d) => d.environment !== 'main' && d.latestStatus.state === 'SUCCESS').map((d) => d.environment);
-            for (const pr of prsReadyForReviews) {
+            const activeDeployments = lastDeployments === null || lastDeployments === void 0 ? void 0 : lastDeployments.repository.deployments.nodes.filter((d) => d.latestStatus.state === 'SUCCESS' ||
+                d.latestStatus.state === 'IN_PROGRESS').map((d) => d.environment);
+            for (const pr of pullRequests === null || pullRequests === void 0 ? void 0 : pullRequests.repository.pullRequests.nodes) {
                 // Check that the PR has an active deployment (matching deployment url)
-                const hasAnActiveDeployment = activeDeployments.filter((environment) => environment.includes(`pr-${pr.number}`)).length
-                    ? true
-                    : false;
+                const hasAnActiveDeployment = Boolean(activeDeployments.filter((environment) => environment.includes(`pr-${pr.number}`)).length);
                 if (hasAnActiveDeployment) {
                     // Apply custom label
                     yield octokit.graphql(addLabelToPR, {

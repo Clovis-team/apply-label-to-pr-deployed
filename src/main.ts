@@ -5,7 +5,6 @@ import type {GraphQlQueryResponseData} from '@octokit/graphql'
 type PullRequest = {
   id: string
   number: number
-  isDraft: boolean
 }
 
 type Deployment = {
@@ -21,7 +20,6 @@ const getAllOpenedPrIds = `query($repo: String!, $owner: String!) {
       nodes {
         id
         number
-        isDraft
       }
     }
   }
@@ -55,19 +53,13 @@ async function run(): Promise<void> {
     const repoOwner = core.getInput('repo_owner')
     const octokit = github.getOctokit(token)
 
-    const allOpenedPrs: GraphQlQueryResponseData = await octokit.graphql(
+    const pullRequests: GraphQlQueryResponseData = await octokit.graphql(
       getAllOpenedPrIds,
       {
         owner: repoOwner,
         repo: repoName
       }
     )
-
-    // Exclude draft PRs
-    const prsReadyForReviews: PullRequest[] =
-      allOpenedPrs?.repository.pullRequests.nodes.filter(
-        (pr: PullRequest) => !pr.isDraft
-      )
 
     const lastDeployments: GraphQlQueryResponseData = await octokit.graphql(
       getLastDeployments,
@@ -77,24 +69,23 @@ async function run(): Promise<void> {
       }
     )
 
-    // Exclude :
-    // - main environment
-    // - IN_PROGRESS or INACTIVE deployment
     const activeDeployments: string[] =
       lastDeployments?.repository.deployments.nodes
         .filter(
           (d: Deployment) =>
-            d.environment !== 'main' && d.latestStatus.state === 'SUCCESS'
+            d.latestStatus.state === 'SUCCESS' ||
+            d.latestStatus.state === 'IN_PROGRESS'
         )
         .map((d: Deployment) => d.environment)
 
-    for (const pr of prsReadyForReviews) {
+    for (const pr of pullRequests?.repository.pullRequests
+      .nodes as PullRequest[]) {
       // Check that the PR has an active deployment (matching deployment url)
-      const hasAnActiveDeployment = activeDeployments.filter(
-        (environment: string) => environment.includes(`pr-${pr.number}`)
-      ).length
-        ? true
-        : false
+      const hasAnActiveDeployment = Boolean(
+        activeDeployments.filter((environment: string) =>
+          environment.includes(`pr-${pr.number}`)
+        ).length
+      )
 
       if (hasAnActiveDeployment) {
         // Apply custom label
