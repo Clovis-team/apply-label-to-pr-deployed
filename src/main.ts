@@ -38,7 +38,7 @@ const getLastDeployments = `query($repo: String!, $owner: String!) {
   }
 }`
 
-const addLabelToPR = `mutation AddLabelToPR($pullRequestId: String!, $labelId: String!) {
+const addLabelToPR = `mutation AddLabelToPR($pullRequestId: ID!, $labelId: ID!) {
   addLabelsToLabelable(input: {clientMutationId: "apply-label-to-pr-deployed-action", labelableId: $pullRequestId, labelIds: [$labelId]}) {
     clientMutationId
   }
