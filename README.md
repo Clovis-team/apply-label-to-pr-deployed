@@ -11,6 +11,7 @@ This actions is gonna gather all opened PR's, check if they have an active deplo
     repo_name: 'REPO_NAME'
     repo_owner: 'REPO_OWNER'
     label_id: 'YOUR_LABEL_ID'
+    excluding_label: 'protected'
 ```
 
 ## How to do a new release:
