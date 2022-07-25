@@ -37,8 +37,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
-const getAllOpenedPrIds = `query($repo: String!, $owner: String!) {
+const getAllOpenedPrIds = `query($repo: String!, $owner: String!, $excludingLabel: [String!]) {
   repository(name: $repo, owner: $owner) {
+    pr_protected: pullRequests(first: 100, states: OPEN, labels: $excludingLabel) {
+      nodes {
+        id
+        number
+      }
+    }
     pullRequests(first: 100, states: OPEN) {
       nodes {
         id
@@ -70,12 +76,14 @@ function run() {
             const token = (core.getInput('github_token') ||
                 process.env.GITHUB_TOKEN);
             const labelId = core.getInput('label_id');
+            const excludingLabel = core.getInput('excluding_label');
             const repoName = core.getInput('repo_name');
             const repoOwner = core.getInput('repo_owner');
             const octokit = github.getOctokit(token);
             const pullRequests = yield octokit.graphql(getAllOpenedPrIds, {
                 owner: repoOwner,
-                repo: repoName
+                repo: repoName,
+                excludingLabel: excludingLabel ? [excludingLabel] : []
             });
             const lastDeployments = yield octokit.graphql(getLastDeployments, {
                 owner: repoOwner,
@@ -83,7 +91,9 @@ function run() {
             });
             const activeDeployments = lastDeployments === null || lastDeployments === void 0 ? void 0 : lastDeployments.repository.deployments.nodes.filter((d) => d.latestStatus.state === 'SUCCESS' ||
                 d.latestStatus.state === 'IN_PROGRESS').map((d) => d.environment);
-            for (const pr of pullRequests === null || pullRequests === void 0 ? void 0 : pullRequests.repository.pullRequests.nodes) {
+            const excludedPullRequests = pullRequests === null || pullRequests === void 0 ? void 0 : pullRequests.repository.pr_protected.nodes.map((pr) => pr.id);
+            const filteredPullRequests = pullRequests.repository.pullRequests.nodes.filter((pr) => !excludedPullRequests.includes(pr.id));
+            for (const pr of filteredPullRequests) {
                 // Check that the PR has an active deployment (matching deployment url)
                 const hasAnActiveDeployment = Boolean(activeDeployments.filter((environment) => environment.includes(`pr-${pr.number}`)).length);
                 if (hasAnActiveDeployment) {

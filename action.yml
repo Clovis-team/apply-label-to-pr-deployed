@@ -1,22 +1,25 @@
-name: 'Apply label to all PR deployed'
-description: 'Apply label to all PR deployed'
-author: 'David Alvarez'
+name: "Apply label to all PR deployed"
+description: "Apply label to all PR deployed"
+author: "David Alvarez"
 branding:
-  icon: 'package'
-  color: 'green'
+  icon: "package"
+  color: "green"
 inputs:
   github_token:
-    description: 'The GitHub token (if not provided the environment variable GITHUB_TOKEN will be used instead)'
+    description: "The GitHub token (if not provided the environment variable GITHUB_TOKEN will be used instead)"
     required: false
   repo_name:
-    description: 'Name of the repository'
+    description: "Name of the repository"
     required: true
   repo_owner:
-    description: 'Owner of the repository'
+    description: "Owner of the repository"
     required: true
   label_id:
-    description: 'The label ID to apply'
+    description: "The label ID to apply"
     required: true
+  excluding_label:
+    description: "The label name which exclude PR from the script"
+    required: false
 runs:
-  using: 'node12'
-  main: 'dist/index.js'
+  using: "node12"
+  main: "dist/index.js"

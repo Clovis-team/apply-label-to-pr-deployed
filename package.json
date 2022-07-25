@@ -1,6 +1,6 @@
 {
   "name": "apply-label-to-pr-deployed",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Apply label to all PR deployed",
   "main": "lib/main.js",
   "scripts": {
