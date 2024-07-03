@@ -20,6 +20,11 @@ inputs:
   excluding_label:
     description: "The label name which exclude PR from the script"
     required: false
+permissions:
+  # cf https://stackoverflow.com/questions/70435286/resource-not-accessible-by-integration-on-github-post-repos-owner-repo-ac
+  contents: read
+  actions: read
+  checks: write
 runs:
   using: "node12"
   main: "dist/index.js"
